@@ -9,7 +9,7 @@ module Astrodynamics
     export ecctomea, meantoecc, ecctotrue, truetoecc
     export propagate
     export planets
-    export cartesian
+    export cartesian, elements
 
     immutable State
         rv::Vector
