@@ -10,6 +10,7 @@ module Astrodynamics
     export propagate
     export planets
     export cartesian, elements
+    export newton,findiff
 
     immutable State
         rv::Vector

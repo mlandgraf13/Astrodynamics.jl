@@ -40,6 +40,26 @@ function frdist(body::ASCIIString,dv1::Vector=[0;0;0], dv2::Vector=[0;0;0],
     r=sqrt(diag(delta*delta'))
 end
 
+function frrrate(body::ASCIIString,dv1::Vector=[0;0;0], dv2::Vector=[0;0;0],
+               dv3::Vector=[0;0;0])
+
+    tra=frtraj(dv1,dv2,dv3)
+    mjd2k_TDB=tra[1]/86400+0.5
+    
+    #obtain moon states for range of epochs 
+    xm=jpleph(mjd2k_TDB,body,"Earth");
+    #relative position and velocity vectors are needed
+    deltaR=traj[2][:,1:3]-xm[1:3,:]';
+    deltaV=traj[2][:,4:6]-xm[4:6,:]';
+
+    # rr_dot=(vec(r),vec(r_dot))
+    r=sqrt(diag(deltaR*deltaR'))
+    # the "diag" term is the inner product
+    rrate=diag(deltaR*deltaV')./r
+
+    return(rrate)
+end
+
 function frinc(dv1=[0;0;0],dv2=[0;0;0],
                dv3=[0;0;0])
     el=elements(frxf(dv1,dv2,dv2),planets["earth"]["mu"]);
