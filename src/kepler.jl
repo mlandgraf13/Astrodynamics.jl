@@ -5,7 +5,7 @@ function meantoecc(M::FloatingPoint, ecc::FloatingPoint)
 end
 
 function ecctomean(E::FloatingPoint, ecc::FloatingPoint)
-    return E - ecc*sin(E)
+    return ecc<1.0 ? E - ecc*sin(E) : ecc*sinh(E)-E
 end
 
 function ecctotrue(E::FloatingPoint, ecc::FloatingPoint)
@@ -13,7 +13,7 @@ function ecctotrue(E::FloatingPoint, ecc::FloatingPoint)
 end
 
 function truetoecc(T::FloatingPoint, ecc::FloatingPoint)
-    return 2*atan2(sqrt(1 - ecc)*sin(T/2), sqrt(1 + ecc)*cos(T/2))
+    return 2*atan2(sqrt(1 - ecc)*sin(T/2), sqrt(1 + ecc)*cos(T/2)) 
 end
 
 function period(a::FloatingPoint, mu::FloatingPoint)
