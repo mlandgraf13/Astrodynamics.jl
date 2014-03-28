@@ -87,11 +87,11 @@ function prop(x0,et0,etf,refbod="earth",stopco=falses(1))
         deltar=delta[:,1:3]
         r=sqrt(diag(deltar*deltar'))
         dr=(r[2:end]-r[1:end-1])./(et[2:end]-et[1:end-1])
-        # detect sign change from negative to positive in dr
+        # detect all sign changes from negative to positive in dr
         sgnchg=find((sign(dr[2:end]).*sign(dr[1:end-1]) .< 0.0) 
                     & (sign(dr[1:end-1]).<0.0))
-        idx=sgnchg[1]
         #use the first change of sign
+        idx=sgnchg[1]
         x0=delta[idx,:]
         t0=tra[1][idx]
         el0=elements(x0,mu)
