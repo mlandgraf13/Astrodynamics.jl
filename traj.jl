@@ -28,16 +28,16 @@ function frtraj(dv1::Vector=[0;0;0],dv2::Vector=[0;0;0],
     
     #third arc from periselenium manoeuvre to manoeuvre 3
     tra3=prop(x0,t0,t0+dtm3)
-    t0=tra1[1][end]
-    xf=tra1[2][end,:]
+    t0=tra3[1][end]
+    xf=tra3[2][end,:]
     # add delta-v3
     x0=[xf[1:3];xf[4:6]+dv3]
 
     #fourth arc from manoeuvre 3 to perigee
     tra4=prop(x0,t0,et1,"earth",true)
 
-    return([tra1[1];tra2[1];tra3[1]],
-           [tra1[2];tra2[2];tra3[2]])
+    return([tra1[1];tra2[1];tra3[1];tra4[1]],
+           [tra1[2];tra2[2];tra3[2];tra4[2]])
 end
 
 function frxf(dv1::Vector=[0;0;0], dv2::Vector=[0;0;0],
@@ -67,7 +67,7 @@ end
 
 #---------------------------------------------------
 # prop is a simple propagator to final time or
-# to next peri/apocentre
+# to next pericentre
 #---------------------------------------------------
 function prop(x0,et0,etf,refbod="earth",stopco=falses(1))
 
@@ -76,7 +76,7 @@ function prop(x0,et0,etf,refbod="earth",stopco=falses(1))
     mjd2k_TDB=tra[1]/86400+0.5
     et=tra[1]
     
-    if(stopco[1]) # peri/apocentre stop condition
+    if(stopco[1]) # pericentre stop condition
         if (refbod=="earth")
             delta=tra[2]
         else
@@ -87,16 +87,15 @@ function prop(x0,et0,etf,refbod="earth",stopco=falses(1))
         deltar=delta[:,1:3]
         r=sqrt(diag(deltar*deltar'))
         dr=(r[2:end]-r[1:end-1])./(et[2:end]-et[1:end-1])
-        sgnchg=find(sign(dr[2:end]).*sign(dr[1:end-1]).<0.0)
+        # detect sign change from negative to positive in dr
+        sgnchg=find((sign(dr[2:end]).*sign(dr[1:end-1]) .< 0.0) 
+                    & (sign(dr[1:end-1]).<0.0))
         idx=sgnchg[1]
-        #debug
-        display(r[idx:idx+3])
-        display(dr[idx:idx+3])
         #use the first change of sign
         x0=delta[idx,:]
         t0=tra[1][idx]
         el0=elements(x0,mu)
-        f0=rem(el0[6],2pi)
+        f0=rem(el0[6],2pi)-2pi
         M0=ecctomean(truetoecc(f0,el0[2]),el0[2])
 
         f=round(f0/pi)*pi
@@ -118,13 +117,6 @@ function prop(x0,et0,etf,refbod="earth",stopco=falses(1))
         newt=[tra[1][1:idx];t]
         newx=[tra[2][1:idx,:];x']
 
-#debug
-        display(f0)
-        display(f)
-        display(M0)
-        display(M)
-        display(dt)
-        
         tra=(newt,newx)
     end
     return(tra)
