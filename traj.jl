@@ -58,12 +58,13 @@ function prop(x0,et0,etf,refbod="earth",stopco=falses(1))
     et=tra[1]
     
     if(stopco[1]) # peri/apocentre stop condition
-        if (refbod=="Earth")
+        if (refbod=="earth")
             delta=traj[2]
         else
             xm=jpleph(mjd2k_TDB,refbod,"earth")
             delta=tra[2]-xm'
         end
+
         deltar=delta[:,1:3]
         r=sqrt(diag(deltar*deltar'))
         dr=(r[2:end]-r[1:end-1])./(et[2:end]-et[1:end-1])
@@ -72,16 +73,28 @@ function prop(x0,et0,etf,refbod="earth",stopco=falses(1))
         x0=delta[sgnchg[1],:]
         t0=tra[1][sgnchg[1]]
         el0=elements(x0,mu)
-        f0=el0[6]
+        f0=rem(el0[6],2pi)-2pi
+        M0=ecctomean(truetoecc(f0,el0[2]),el0[2])
+
         f=round(f0/pi)*pi
         el=[el0[1:5];f]
-        x=cartesian(el,mu)
-        M0=ecctomean(truetoecc(f0,el[2]),el[2])
+
         M=ecctomean(truetoecc(f,el[2]),el[2])
-        n=sqrt(mu/el(1)^3)
+        n=el[1] > 0.0 ? sqrt(mu/el[1]^3) : sqrt(mu/(-el[1]^3))
         dt=(M-M0)/n
+
         t=t0+dt
-        tra=([tra1[1][1:sgnchg];t],[tra[2][1:sgnchg,:];x])
+
+        if (refbod=="earth")
+            x=cartesian(el,mu)
+        else
+            mjd2k_TDB=t/86400+0.5
+            xm=jpleph(mjd2k_TDB,refbod,"earth")
+            x=cartesian(el,mu) + xm
+        end
+        newt=[tra[1][1:sgnchg[1]];t]
+        newx=[tra[2][1:sgnchg[1],:];x']
+        tra=(newt,newx)
     end
     return(tra)
 end

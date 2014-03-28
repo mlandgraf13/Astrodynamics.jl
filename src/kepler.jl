@@ -1,6 +1,6 @@
 function meantoecc(M::FloatingPoint, ecc::FloatingPoint)
-    kepler(E) = E - ecc*sin(E) - M
-    kepler_der(E) = 1 - ecc*cos(E)
+    kepler(E) = ecc < 1.0 ? E - ecc*sin(E) - M : ecc*sinh(E) - E
+    kepler_der(E) = ecc < 1.0 ? 1 - ecc*cos(E) : ecc*cosh(E) - 1
     return newton(M, kepler, kepler_der)
 end
 
@@ -9,11 +9,15 @@ function ecctomean(E::FloatingPoint, ecc::FloatingPoint)
 end
 
 function ecctotrue(E::FloatingPoint, ecc::FloatingPoint)
-    return 2*atan2(sqrt(1 + ecc)*sin(E/2), sqrt(1 - ecc)*cos(E/2))
+    return ecc < 1.0 ? 
+           2*atan2(sqrt(1 + ecc)*sin(E/2), sqrt(1 - ecc)*cos(E/2)) :
+           2*atan2(sqrt(ecc + 1)*sin(E/2), sqrt(ecc - 1)*sin(E/2))
 end
 
 function truetoecc(T::FloatingPoint, ecc::FloatingPoint)
-    return 2*atan2(sqrt(1 - ecc)*sin(T/2), sqrt(1 + ecc)*cos(T/2)) 
+    return ecc<1.0 ?  
+        2*atan2(sqrt(1 - ecc)*sin(T/2), sqrt(1 + ecc)*cos(T/2)) :
+        2*atan2(sqrt(ecc - 1)*sin(T/2), sqrt(ecc + 1)*cos(T/2))
 end
 
 function period(a::FloatingPoint, mu::FloatingPoint)
