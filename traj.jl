@@ -61,8 +61,10 @@ end
 
 function frinc(dv1=[0;0;0],dv2=[0;0;0],
                dv3=[0;0;0])
+
     el=elements(frxf(dv1,dv2,dv2),planets["earth"]["mu"]);
-    el[3]
+    return(el[3])
+
 end
 
 #---------------------------------------------------
@@ -90,34 +92,38 @@ function prop(x0,et0,etf,refbod="earth",stopco=falses(1))
         # detect all sign changes from negative to positive in dr
         sgnchg=find((sign(dr[2:end]).*sign(dr[1:end-1]) .< 0.0) 
                     & (sign(dr[1:end-1]).<0.0))
-        #use the first change of sign
-        idx=sgnchg[1]
-        x0=delta[idx,:]
-        t0=tra[1][idx]
-        el0=elements(x0,mu)
-        f0=rem(el0[6],2pi)-2pi
-        M0=ecctomean(truetoecc(f0,el0[2]),el0[2])
+        if (~isempty(sgnchg))
+            #use the first change of sign
+            idx=sgnchg[1]
+            x0=delta[idx,:]
+            t0=tra[1][idx]
+            el0=elements(x0,mu)
+            f0=rem(el0[6],2pi)-2pi
+            M0=ecctomean(truetoecc(f0,el0[2]),el0[2])
 
-        f=round(f0/pi)*pi
-        el=[el0[1:5];f]
+            f=round(f0/pi)*pi
+            el=[el0[1:5];f]
 
-        M=ecctomean(truetoecc(f,el[2]),el[2])
-        n=el[1] > 0.0 ? sqrt(mu/el[1]^3) : sqrt(mu/(-el[1]^3))
-        dt=(M-M0)/n
+            M=ecctomean(truetoecc(f,el[2]),el[2])
+            n=el[1] > 0.0 ? sqrt(mu/el[1]^3) : sqrt(mu/(-el[1]^3))
+            dt=(M-M0)/n
 
-        t=t0+dt
+            t=t0+dt
 
-        if (refbod=="earth")
-            x=cartesian(el,mu)
-        else
-            mjd2k_TDB=t/86400+0.5
-            xm=jpleph(mjd2k_TDB,refbod,"earth")
-            x=cartesian(el,mu) + xm
+            if (refbod=="earth")
+                x=cartesian(el,mu)
+            else
+                mjd2k_TDB=t/86400+0.5
+                xm=jpleph(mjd2k_TDB,refbod,"earth")
+                x=cartesian(el,mu) + xm
+            end
+
+            # the trajectory is truncated at the pericentre
+            newt=[tra[1][1:idx];t]
+            newx=[tra[2][1:idx,:];x']
+
+            tra=(newt,newx)
         end
-        newt=[tra[1][1:idx];t]
-        newx=[tra[2][1:idx,:];x']
-
-        tra=(newt,newx)
     end
     return(tra)
 end
