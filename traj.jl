@@ -133,4 +133,7 @@ function prop(x0,et0,etf,refbod="earth",stopco=falses(1))
     return(tra)
 end
 
-
+function frconstr(x::Vector)
+    el=elements(frxf(x[1:3],x[4:6],x[7:9]),planets["earth"]["mu"])
+    return ([el[1]*(1-el[2]);el[3]])
+end
