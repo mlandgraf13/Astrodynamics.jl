@@ -48,3 +48,15 @@ function fingrd(F::Function,x0::Vector,tol::Float64=(eps())^(1/3))
 
     return(dF)
 end
+
+function finvgrd(F::Array{Function,1},x0::Vector,tol::Float64=(eps())^(1/3))
+    m=length(F)
+    n=length(x0)
+    
+    vgrd=zeros(m,n)
+    for j=1:m
+        vgrd[j,:]=fingrd(F[j],x0,tol)
+    end
+    
+    return(vgrd)
+end
