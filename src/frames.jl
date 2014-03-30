@@ -20,7 +20,9 @@ function elements(rv::Vector, mu::FloatingPoint)
     inc = acos(h[3]/hm)
     node = acos(n[1]/nm)
     peri = acos(dot(n, ec)/(ecc*nm))
-    ano = acos(dot(ec, r)/(ecc*rm))
+    # this is a workaround to avoid domainerror - dot and/or
+    #  norm must be fixed
+    ano = acos(max(min(dot(ec, r)/(ecc*rm),1),-1))
     if n[2] < 0
         node = 2*pi - node
     end
