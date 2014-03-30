@@ -32,3 +32,19 @@ function findiff(F::Function,x0::Float64,tol::Float64=(eps())^(1/3))
     dx = (x0==0 ? tol:x0*tol)
     return( (F(x0+dx) - F(x0-dx)) / (2*dx) )
 end
+
+#---------------------------------------------------
+# finite difference differentiation calculation of gradient
+# written by Markus Landgraf. Last modified 30Mar14
+#---------------------------------------------------
+function fingrd(F::Function,x0::Vector,tol::Float64=(eps())^(1/3))
+    n=length(x0)
+    dF=zeros(n)
+
+    for j=1:n
+        F1(x)=F([x0[1:j-1];x;x0[j+1:end]])
+        dF[j]=findiff(F1,x0[j],tol)
+    end
+
+    return(dF)
+end

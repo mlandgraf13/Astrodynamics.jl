@@ -9,19 +9,20 @@ function frtraj(dv1::Vector=[0;0;0],dv2::Vector=[0;0;0],
               -3.35817;
               ]
     const et0=5.68022588928017e8
-    const et1=5.68474771104017e8+2*86400
     const etm1=et0+86400
     const dtm3=86400
+    const dtmax=10*86400
 
     # first arc from perigee to manoeuvre 1
     tra1=prop(x0,et0,etm1)
     t0=tra1[1][end]
+    tf=t0+dtmax
     xf=tra1[2][end,:]
     # add delta-v1
     x0=[xf[1:3];xf[4:6]+dv1]
 
     #second arc from manoeuvre 1 to periselenium manoeuvre
-    tra2=prop(x0,t0,et1,"moon",true);
+    tra2=prop(x0,t0,tf,"moon",true);
     t0=tra2[1][end]
     xf=tra2[2][end,:]
     x0=[xf[1:3];xf[4:6]+dv2]
@@ -29,12 +30,14 @@ function frtraj(dv1::Vector=[0;0;0],dv2::Vector=[0;0;0],
     #third arc from periselenium manoeuvre to manoeuvre 3
     tra3=prop(x0,t0,t0+dtm3)
     t0=tra3[1][end]
+    tf=t0+dtmax
     xf=tra3[2][end,:]
+    
     # add delta-v3
     x0=[xf[1:3];xf[4:6]+dv3]
 
     #fourth arc from manoeuvre 3 to perigee
-    tra4=prop(x0,t0,et1,"earth",true)
+    tra4=prop(x0,t0,tf,"earth",true)
 
     return([tra1[1];tra2[1];tra3[1];tra4[1]],
            [tra1[2];tra2[2];tra3[2];tra4[2]])
@@ -62,10 +65,12 @@ end
 function frinc(dv1=[0;0;0],dv2=[0;0;0],
                dv3=[0;0;0])
 
-    el=elements(frxf(dv1,dv2,dv2),planets["earth"]["mu"]);
+    el=elements(frxf(dv1,dv2,dv3),planets["earth"]["mu"]);
     return(el[3])
 
 end
+
+frinc(x::Vector) = frinc(x[1:3],x[4:6],x[7:9])
 
 #---------------------------------------------------
 # prop is a simple propagator to final time or
