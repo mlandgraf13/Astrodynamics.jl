@@ -133,14 +133,6 @@ function prop(x0,et0,etf,refbod="earth",stopco=falses(1))
     return(tra)
 end
 
-<<<<<<< HEAD
-function misconstr(x::Vector, grad::Vector, target_rp, target_inc)
-    if length(grad>0)
-    end
-
-    xf=frxf(x[1:3],x[4:6],x[7:9])
-    el=elements(xf,planets["earth"]["mu"])
-=======
 function frconstr(result::Vector, x::Vector, grad::AbstractArray,
                   rptarget::Float64=0.0,inctarget::Float64=0.0)
     if length(grad)>0
@@ -162,20 +154,8 @@ end
 function frcost(x::Vector, grad::Vector)
     
     if length(grad) > 0
-        grad[:]=[x[1:3]/norm(x[1:3]);x[4:6]/norm(x[4:6]);x[7:9]/norm(x[7:9])]
-#debug
-        println(size(grad))
-#enddebug        
+        grad[:]=ones(length(x))
     end
-
-    dv=norm(x[1:3])+norm(x[4:6])+norm(x[7:9])
-    return (dv)
-end
-
->>>>>>> FETCH_HEAD
-
-    return(
-           [el[1]*(1-el[2])-target_rp;
-            el(3)-target_inc]
-           )
+    
+    return(sum(x))
 end
