@@ -50,7 +50,7 @@ function fingrd(F::Function,x0::Vector,tol::Float64=(eps())^(1/3))
         dF[:,j]=findiff(F1,x0[j],tol)
     end
 
-    return(dF)
+    return(dF')
 end
 
 function finvgrd(F::Array{Function,1},x0::Vector,tol::Float64=(eps())^(1/3))
