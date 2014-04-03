@@ -133,4 +133,15 @@ function prop(x0,et0,etf,refbod="earth",stopco=falses(1))
     return(tra)
 end
 
+function misconstr(x::Vector, grad::Vector, target_rp, target_inc)
+    if length(grad>0)
+    end
 
+    xf=frxf(x[1:3],x[4:6],x[7:9])
+    el=elements(xf,planets["earth"]["mu"])
+
+    return(
+           [el[1]*(1-el[2])-target_rp;
+            el(3)-target_inc]
+           )
+end
