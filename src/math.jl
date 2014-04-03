@@ -35,16 +35,32 @@ end
 
 #---------------------------------------------------
 # finite difference differentiation calculation of gradient
-# written by Markus Landgraf. Last modified 30Mar14
+# written by Markus Landgraf. Last modified 02Apr14
+# CHANGE RECORD
+# 30Mar14: ML - initial coding
+# 02Apr14: ML - adoption for vector functions
 #---------------------------------------------------
 function fingrd(F::Function,x0::Vector,tol::Float64=(eps())^(1/3))
     n=length(x0)
-    dF=zeros(n)
+    F0=F(x0)
+    dF=zeros(length(F0),n)
 
     for j=1:n
         F1(x)=F([x0[1:j-1];x;x0[j+1:end]])
-        dF[j]=findiff(F1,x0[j],tol)
+        dF[:,j]=findiff(F1,x0[j],tol)
     end
 
-    return(dF)
+    return(dF')
+end
+
+function finvgrd(F::Array{Function,1},x0::Vector,tol::Float64=(eps())^(1/3))
+    m=length(F)
+    n=length(x0)
+    
+    vgrd=zeros(m,n)
+    for j=1:m
+        vgrd[j,:]=fingrd(F[j],x0,tol)
+    end
+    
+    return(vgrd)
 end
