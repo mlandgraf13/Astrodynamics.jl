@@ -151,11 +151,29 @@ function frconstr(result::Vector, x::Vector, grad::AbstractArray,
     result[2]=el[3]-inctarget
 end
 
+function nfrconstr(result::Vector, x::Vector, grad::AbstractArray,
+                  rptarget::Float64=0.0,inctarget::Float64=0.0)
+    if length(grad)>0
+        function f(y)
+            c=zeros(2);
+            frconstr(c,y,[],rptarget,inctarget)
+            c
+        end
+        g=fingrd(f,x);
+        grad[:,:]=g
+        
+    end
+    
+    el=elements(frxf(x[1:3],x[4:6],x[7:9]),planets["earth"]["mu"])
+    result[1]=-(el[1]*(1-el[2])-rptarget)
+    result[2]=-(el[3]-inctarget)
+end
+
 function frcost(x::Vector, grad::Vector)
     
     if length(grad) > 0
-        grad[:]=ones(length(x))
+        grad[:]=2x
     end
-    
-    return(sum(x))
+    display(x)
+    return(x'*x)
 end
