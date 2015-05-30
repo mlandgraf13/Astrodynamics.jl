@@ -1,6 +1,7 @@
 module Astrodynamics
 
     using Datetime
+    using jspice
 
     importall Base
 
@@ -11,6 +12,7 @@ module Astrodynamics
     export planets
     export cartesian, elements
     export newton,findiff,fingrd
+    export eci2emrotpulse,emrotpulse2eci
 
     immutable State
         rv::Vector
