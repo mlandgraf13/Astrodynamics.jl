@@ -12,7 +12,7 @@ module Astrodynamics
     export planets
     export cartesian, elements
     export newton,findiff,fingrd
-    export eci2rotpulse
+    export eci2emrotpulse,emrotpulse2eci
 
     immutable State
         rv::Vector
