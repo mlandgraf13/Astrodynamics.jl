@@ -1,3 +1,8 @@
+function getemrpstate(s::State)
+    rvrot=eci2emrotpulse(s.rv,julian(s.t))
+    State(rvrot,s.t,"emrp","earth")
+end
+
 #------------------------------------------------------------------------
 # transform state vector from Earth-centric inertial MEE2000 to rotating 
 # pulsating frame [natural units]
@@ -6,6 +11,7 @@
 # t::FloatingPoint - epoch in MJD2000
 #OUTPUT
 # rv::Vector - state vector in [DU, DU/TU]
+# Written by Markus Landgraf 30Jun15
 #------------------------------------------------------------------------
 function eci2emrotpulse(rv::Vector, t::FloatingPoint)
     sM=jpleph(t,"Moon","Earth");
@@ -31,8 +37,16 @@ function eci2emrotpulse(rv::Vector, t::FloatingPoint)
     return [npos;nvel];
 end
 
+#------------------------------------------------------------------------
 #transform state vector from Earth-Moon rotating pulsating frame 
 #[natural units] to Earth centric inertial MEE200 frame
+#INPUT 
+# rv::Vector - state vector in [DU, DU/TU]
+# t::FloatingPoint - epoch in MJD2000
+#OUTPUT
+# rv::Vector - state vector in [km, km/s]
+# Written by Markus Landgraf 30Jun15
+#------------------------------------------------------------------------
 function emrotpulse2eci(rv::Vector, t::FloatingPoint)
     sM=jpleph(t,"Moon","Earth");
     rM=norm(sM[1:3]);
