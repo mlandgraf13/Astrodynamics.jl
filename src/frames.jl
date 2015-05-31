@@ -1,3 +1,8 @@
+function getemrpstate(s::State)
+    rvrot=eci2emrotpulse(s.rv,julian(s.t))
+    State(rvrot,s.t,"emrp","earth")
+end
+
 #------------------------------------------------------------------------
 # transform state vector from Earth-centric inertial MEE2000 to rotating 
 # pulsating frame [natural units]
