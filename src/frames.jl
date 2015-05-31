@@ -1,6 +1,5 @@
-function getemrpstate(s::State)
-    rvrot=eci2emrotpulse(s.rv,julian(s.t))
-    State(rvrot,s.t,"emrp","earth")
+function getemrprv(s::State)
+    eci2emrotpulse(s.rv,julian(s.t))
 end
 
 #------------------------------------------------------------------------
