@@ -2,10 +2,6 @@ const JD2000 = 2451544.5
 const JD1950 = 2433282.5
 const MJD = 2400000.5
 
-function ephtim(jd::FloatingPoint)
-    (jd-julian(2000,1,1,12,0,0,"2000"))*86400
-end
-
 function julian(dt::DateTime, base::String="2000")
     return julian(year(dt), month(dt), day(dt), hour(dt), minute(dt), second(dt), base)
 end
@@ -68,4 +64,3 @@ end
 function gregorian(jd::Int, base::String="2000")
     return gregorian(float(jd))
 end
-
