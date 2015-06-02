@@ -172,14 +172,7 @@ end
 function frcost(x::Vector, grad::Vector)
     
     if length(grad) > 0
-<<<<<<< HEAD
         grad[:]=2*x
     end
     return((x'x)[1])
-=======
-        grad[:]=2x
-    end
-    display(x)
-    return(x'*x)
->>>>>>> origin/IMDEX
 end
