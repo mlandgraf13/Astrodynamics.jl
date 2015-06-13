@@ -8,19 +8,24 @@ function prop(x0::Vector,et0::FloatingPoint,etf::FloatingPoint;
 
     mu=planets[refbod]["mu"]
     tra_t,tra_x=ode45(der,x0,[et0;etf])
-    mjd2k_TDB=tra_t/86400+0.5
-    et=tra_t[1]
-    
-    if stopco[1] # pericentre stop condition
-        if (refbod=="earth")
-            delta=tra_x
-        else
-            xm=jpleph(mjd2k_TDB,refbod,"earth")
-            ddelta=tra_x-xm'
-        end
+    mjd2k=tra_t/86400+0.5
+    et=tra_t
+    tra=(tra_t,tra_x)
 
-        deltar=delta[:,1:3]
-        r=sqrt(diag(deltar*deltar'))
+    if stopco[1] # pericentre stop condition
+        n=length(tra_t)
+        if (refbod=="earth")
+            delta=[tra_x[j][:] for j=1:n]
+        else
+            xm=jpleph(mjd2k,refbod,"earth")
+            delta=[tra_x[j][:]-xm[:,j] for j=1:n]
+        end
+        
+        deltar=zeros(3,n)
+        for j=1:n
+            deltar[:,j]=delta[j][1:3]
+        end
+        r=sqrt(diag(deltar'*deltar))
         dr=(r[2:end]-r[1:end-1])./(et[2:end]-et[1:end-1])
         # detect all sign changes from negative to positive in dr
         sgnchg=find((sign(dr[2:end]).*sign(dr[1:end-1]) .< 0.0) 
@@ -28,7 +33,7 @@ function prop(x0::Vector,et0::FloatingPoint,etf::FloatingPoint;
         if (~isempty(sgnchg))
             #use the first change of sign
             idx=sgnchg[1]
-            x0=delta[idx,:]
+            x0=delta[idx]
             t0=tra_t[idx]
             el0=elements(x0,mu)
             f0=rem(el0[6],2pi)-2pi
@@ -46,22 +51,22 @@ function prop(x0::Vector,et0::FloatingPoint,etf::FloatingPoint;
             if (refbod=="earth")
                 x=cartesian(el,mu)
             else
-                mjd2k_TDB=t/86400+0.5
-                xm=jpleph(mjd2k_TDB,refbod,"earth")
+                mjd2k=t/86400+0.5
+                xm=jpleph(mjd2k,refbod,"earth")
                 x=cartesian(el,mu) + xm
             end
 
             # the trajectory is truncated at the pericentre
-            newt=[tra_t[1:idx] et]
-            newx=Array(Any,idx+1);
-            newx[1:idx]=tra_x[1:idx];
-            newx[idx+1]=x;
+            newt=[tra_t[1:idx];t]
+            newx=Array(Any,idx+1)
+            newx[1:idx]=tra_x[1:idx]
+            newx[idx+1]=x
 
             tra=(newt,newx)
         end
     elseif stopco[2] # xz crossing
         n=length(tra_t)
-        rottra=[eci2emrotpulse(tra_x[j],mjd2k_TDB[j]) for j=1:n]
+        rottra=[eci2emrotpulse(tra_x[j],mjd2k[j]) for j=1:n]
         # detect all sign changes of yr
         yr=[rottra[j][2] for j=1:n]
         syrright=sign(yr[2:end])
@@ -101,9 +106,9 @@ function prop(x0::Vector,et0::FloatingPoint,etf::FloatingPoint;
             end
             # concatenate new trajectory with x-z crossing as new final point
             newt=[tra_t[1:idx];et]
-            newx=Array(Any,idx+1);
-            newx[1:idx]=tra_x[1:idx];
-            newx[idx+1]=x;
+            newx=Array(Any,idx+1)
+            newx[1:idx]=tra_x[1:idx]
+            newx[idx+1]=x
             tra=(newt,newx)
         end
     end
