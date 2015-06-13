@@ -52,8 +52,10 @@ function prop(x0::Vector,et0::FloatingPoint,etf::FloatingPoint;
             end
 
             # the trajectory is truncated at the pericentre
-            newt=[tra_t[1:idx] t]
-            newx=[tra_x[1:idx] x]
+            newt=[tra_t[1:idx] et]
+            newx=Array(Any,idx+1);
+            newx[1:idx]=tra_x[1:idx];
+            newx[idx+1]=x;
 
             tra=(newt,newx)
         end
