@@ -2,13 +2,15 @@ module Astrodynamics
 
     using Datetime
     using jspice
+    using ODE
+    using DerIMDEX
 
     importall Base
 
     export State
     export julian, gregorian, JD2000, JD1950, MJD, ephtim
     export ecctomean, meantoecc, ecctotrue, truetoecc
-    export propagate
+    export propagate, prop
     export planets
     export cartesian, elements
     export newton,findiff,fingrd
@@ -51,6 +53,7 @@ module Astrodynamics
     include("frames.jl")
     include("math.jl")
     include("kepler.jl")
+    include("prop.jl")
 
     iss = State([8.59072560e+02; -4.13720368e+03; 5.29556871e+03; 7.37289205e+00; 2.08223573e+00; 4.39999794e-01],
         julian(2013,3,18,12,0,0,"2000"), "eci", "earth")

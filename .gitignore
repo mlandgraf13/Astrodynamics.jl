@@ -16,3 +16,7 @@ traj.jl~
 .ipynb_checkpoints/frtest2-checkpoint.ipynb
 
 .ipynb_checkpoints/frtest-checkpoint.ipynb
+
+*.jl~
+
+src/.#prop.jl
